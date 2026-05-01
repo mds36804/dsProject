@@ -1,3 +1,25 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+#step 1: imports
+#step 1.5: clean the data set
+#step 2: load the data
+#step 3: preprocessing
+#step 4: model
+#step 5: evaluate
+#feature inspection, histograms, kde plots, distriution of grades
+#box plots for preformance across grades and categories
+#heat maps
+#scatter plots -> study habits academic outomces
+#final grade --> depedent models
+#regression analysis + regressions models
+#linear regression
+#background factors --> student performance
+#tree based models --> decision tress and random forests 
+#splitting data sets
+#divide data into testing and traingn sets
+#evalutaed using means squared error, r squared accuracy, precision and recall
+
