@@ -25,10 +25,42 @@ import numpy as np
 
 df = pd.read_csv("Maths.csv")
 
+
+#---------------------------------------------------------------------
+
+#CLEAN THE DATA RN RNRNRNRNR
+
+#---------------------------------------------------------------------
 #convert coloums to 0/1
 yes_no_cols = [
     "schoolsup","famsup","paid","activities","nursery",
     "higher","internet","romantic"
 ]
+df[yes_no_cols] = df[yes_no_cols].replace({"yes": 1, "no": 0})
+
+#categorical coloums to dtypes
+cat_cols = [
+    "school","sex","address","famsize","Pstatus",
+    "Mjob","Fjob","reason","guardian"
+]
+
+for col in cat_cols:
+    df[col] = df[col].astype("category")
+
+#numerical coloums to dtypes
+numeric_cols = [
+    "age","Medu","Fedu","traveltime","studytime","failures",
+    "famrel","freetime","goout","Dalc","Walc","health",
+    "absences","G1","G2","G3"
+]
+
+df[numeric_cols] = df[numeric_cols].apply(pd.to_numeric, errors="coerce")
+
+#remove grade values that aren't 0-20
+df = df[(df["G1"] <= 20) & (df["G2"] <= 20) & (df["G3"] <= 20)]
+
+#drop missing values
+df = df.dropna()
 
 print(df.head())
+print(df.info())
