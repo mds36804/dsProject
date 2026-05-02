@@ -76,3 +76,67 @@ df[binary_cols] = df[binary_cols].replace({"yes": 1, "no": 0}).astype(int)
 
 print(df.head())
 print(df.info())
+
+
+#-----------
+
+#eDA
+
+#-----
+
+
+# G3 distribution as a Bar chart
+plt.figure(figsize=(10,4))
+plt.hist(df["G3"], bins=21, edgecolor="white", color="steelblue")
+plt.title("Final Grade (G3) Distribution")
+plt.xlabel("Grade")
+plt.ylabel("Count")
+plt.show()
+
+#all features bar chart
+numeric_cols = ["age","studytime","failures","absences","G1","G2","G3"]
+
+df[numeric_cols].hist(figsize=(12,8), bins=15, edgecolor="white")
+plt.suptitle("Numeric Feature Distributions")
+plt.show()
+
+#study time vs final grade
+plt.figure(figsize=(8,5))
+sea.boxplot(x="studytime", y="G3", data=df)
+plt.title("Study Time vs Final Grade")
+plt.show()
+
+#failures vs final grade
+
+plt.figure(figsize=(8,5))
+sea.boxplot(x="failures", y="G3", data=df)
+plt.title("Past Failures vs Final Grade")
+plt.show()
+
+
+#absences vs g3
+plt.figure(figsize=(8,5))
+plt.scatter(df["absences"], df["G3"], alpha=0.5)
+plt.xlabel("Absences")
+plt.ylabel("Final Grade (G3)")
+plt.title("Absences vs Final Grade")
+plt.show()
+
+# studytime vs g3
+
+plt.figure(figsize=(8,5))
+plt.scatter(df["studytime"], df["G3"], alpha=0.5)
+plt.xlabel("Study Time")
+plt.ylabel("Final Grade (G3)")
+plt.title("Study Time vs Final Grade")
+plt.show()
+
+#heatmap
+plt.figure(figsize=(12,10))
+df_numeric = df.select_dtypes(include=["int64", "float64", "bool"])
+plt.figure(figsize=(12,10))
+sea.heatmap(df_numeric.corr(), cmap="coolwarm", annot=False)
+plt.title("Correlation Heatmap")
+plt.show()
+plt.title("Correlation Heatmap")
+plt.show()
