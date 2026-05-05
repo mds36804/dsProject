@@ -2,7 +2,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sea
-
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
 
 #step 1: imports
 #step 1.5: clean the data set
@@ -140,3 +142,47 @@ plt.title("Correlation Heatmap")
 plt.show()
 plt.title("Correlation Heatmap")
 plt.show()
+
+#_____________________________________
+
+#         MODELING
+#____________________________________
+
+
+#80% training 20% testing stratified so pass/fail ratio stays balanced
+
+# features (drop midterm grades + final grade + pass label)
+X = df.drop(columns=["G1", "G2", "G3", "pass"])
+
+# regression target
+y_reg = df["G3"]
+
+# classification target
+y_clf = df["pass"]
+
+# split
+X_train, X_test, yreg_train, yreg_test, yclf_train, yclf_test = train_test_split(
+    X, y_reg, y_clf,
+    test_size=0.2,
+    random_state=42,
+    stratify=y_clf
+)
+
+print("Training samples:", X_train.shape[0])
+print("Testing samples:", X_test.shape[0])
+
+
+#Linear regression
+lr = LinearRegression()
+lr.fit(X_train, yreg_train)
+
+pred_lr = lr.predict(X_test)
+
+mse_lr = mean_squared_error(yreg_test, pred_lr)
+rmse_lr = np.sqrt(mse_lr)
+r2_lr = r2_score(yreg_test, pred_lr)
+
+print("Linear Regression:")
+print("  MSE:", mse_lr)
+print("  RMSE:", rmse_lr)
+print("  R²:", r2_lr)
