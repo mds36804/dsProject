@@ -7,7 +7,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.model_selection import cross_val_score
 
 #step 1: imports
 #step 1.5: clean the data set
@@ -241,3 +242,59 @@ print("\nRandom Forest Regressor:")
 print("  MSE:", mse_rf)
 print("  RMSE:", rmse_rf)
 print("  R²:", r2_rf)
+
+#creates a bar chart in order of most important features
+importances = rf.feature_importances_
+indices = np.argsort(importances)[::-1]
+features = X_train.columns
+
+plt.figure(figsize=(10, 8))
+plt.title("Feature Importance (Random Forest)")
+plt.bar(range(len(importances)), importances[indices])
+plt.xticks(range(len(importances)), features[indices], rotation=90)
+plt.tight_layout()
+plt.show()
+
+##CLASSIFICATION 
+
+#classification target pass/fail
+ycls = df["pass"]
+
+# features everthing except for pass
+Xcls = df.drop(columns=["pass"])
+
+#train/test split
+X_train_cls, X_test_cls, y_train_cls, y_test_cls = train_test_split(
+    Xcls, ycls, test_size=0.2, random_state=42
+)
+
+#train the classifier
+clf = RandomForestClassifier(random_state=42)
+clf.fit(X_train_cls, y_train_cls)
+
+#predict on the test set
+preds = clf.predict(X_test_cls)
+
+print("\nClassification Model (Random Forest Classifier)")
+print("Accuracy:", accuracy_score(y_test_cls, preds))
+print("\nClassification Report:")
+print(classification_report(y_test_cls, preds))
+
+# 5-fold cross-validation on the Random Forest Regressor
+cv_scores = cross_val_score(rf, X, y_reg, cv=5, scoring='r2')
+
+print("\nCross‑validated R² scores:", cv_scores)
+print("Mean CV R²:", cv_scores.mean())
+
+
+#model comparison tabel
+results = pd.DataFrame({
+    "Model": ["Linear Regression", "Decision Tree", "Random Forest"],
+    "MSE": [mse_lr, mse_dt, mse_rf],
+    "RMSE": [rmse_lr, rmse_dt, rmse_rf],
+    "R²": [r2_lr, r2_dt, r2_rf]
+})
+
+print("\nModel Comparison Table:")
+print(results)
+
