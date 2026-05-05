@@ -5,6 +5,9 @@ import seaborn as sea
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+
 
 #step 1: imports
 #step 1.5: clean the data set
@@ -140,8 +143,6 @@ plt.figure(figsize=(12,10))
 sea.heatmap(df_numeric.corr(), cmap="coolwarm", annot=False)
 plt.title("Correlation Heatmap")
 plt.show()
-plt.title("Correlation Heatmap")
-plt.show()
 
 #_____________________________________
 
@@ -150,6 +151,9 @@ plt.show()
 
 
 #80% training 20% testing stratified so pass/fail ratio stays balanced
+
+# One-hot encode 
+df = pd.get_dummies(df, columns=['sex', 'address', 'famsize', 'Pstatus'], drop_first=True)
 
 # features (drop midterm grades + final grade + pass label)
 X = df.drop(columns=["G1", "G2", "G3", "pass"])
@@ -173,11 +177,15 @@ print("Testing samples:", X_test.shape[0])
 
 
 #Linear regression
+
+#create and train model on data
 lr = LinearRegression()
 lr.fit(X_train, yreg_train)
 
+#predict g3
 pred_lr = lr.predict(X_test)
 
+#evaluate performance
 mse_lr = mean_squared_error(yreg_test, pred_lr)
 rmse_lr = np.sqrt(mse_lr)
 r2_lr = r2_score(yreg_test, pred_lr)
@@ -186,3 +194,50 @@ print("Linear Regression:")
 print("  MSE:", mse_lr)
 print("  RMSE:", rmse_lr)
 print("  R²:", r2_lr)
+
+
+#Decision Tree Regressor
+
+#prevent overfitting
+dt = DecisionTreeRegressor(max_depth=5, min_samples_split=10, random_state=42)
+#train
+dt.fit(X_train, yreg_train)
+
+#predict
+pred_dt = dt.predict(X_test)
+
+#evaluate
+mse_dt = mean_squared_error(yreg_test, pred_dt)
+rmse_dt = np.sqrt(mse_dt)
+r2_dt = r2_score(yreg_test, pred_dt)
+
+print("\nDecision Tree Regressor:")
+print("  MSE:", mse_dt)
+print("  RMSE:", rmse_dt)
+print("  R²:", r2_dt)
+
+#random forest regressor
+
+# Random Forest = many decision trees averaged together
+rf = RandomForestRegressor(
+    n_estimators=100,      # number of trees
+    max_depth=8,           # limit depth to avoid overfitting
+    min_samples_split=5,   # minimum samples to split a node
+    random_state=42
+)
+
+#train
+rf.fit(X_train, yreg_train)
+
+#predict
+pred_rf = rf.predict(X_test)
+
+#evaluate
+mse_rf = mean_squared_error(yreg_test, pred_rf)
+rmse_rf = np.sqrt(mse_rf)
+r2_rf = r2_score(yreg_test, pred_rf)
+
+print("\nRandom Forest Regressor:")
+print("  MSE:", mse_rf)
+print("  RMSE:", rmse_rf)
+print("  R²:", r2_rf)
