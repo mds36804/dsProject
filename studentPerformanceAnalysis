@@ -394,4 +394,13 @@ print("\nModel Comparison Table:")
 print(results)
 
 #Model comparison bar chart (visual summary of R squared across models)
+plt.figure(figsize = (8,5))
+plt.bar(results["Model"], results["R²"], color=["#4c9be8", "#f4a261", "#2a9d8f"], edgecolor="white")
+plt.title("Model Comparison: R² Score")
+plt.ylabel("R² Score")
+plt.ylim(0, 1)
+for i, v in enumerate(results["R²"]):
+    plt.text(i, v + 0.01, f"{v:.3f}", ha="center", fontsize=11)
+plt.tight_layout()
+plt.show()
 
