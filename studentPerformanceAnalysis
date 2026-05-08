@@ -316,7 +316,21 @@ rmse_rf = np.sqrt(mse_rf)
 r2_rf = r2_score(yreg_test, pred_rf)
 
 #print decision tree
+from sklearn.tree import plot_tree
 
+plt.figure(figsize=(25,12))
+plot_tree(
+    dt,
+    feature_names=X.columns,
+    filled=True,
+    max_depth=3,
+    impurity=False,
+    proportion=False,
+    precision = 0,
+    fontsize = 10,
+    rounded=True
+)
+plt.show()
 
 print("\nRandom Forest Regressor:")
 print("  MSE:", mse_rf)
