@@ -167,7 +167,14 @@ if "sex_M" in df.columns:
     plt.show()
 
 #Urban vs. Rural Address vs. Final Grade 
-
+if "address_U" in df.columns:
+    plt.figure(figsize=(6, 5))
+    sea.boxplot(x="address_U", y="G3", data=df, palette="Set1")
+    plt.xticks([0, 1], ["Rural", "Urban"])
+    plt.title("Address (Rural vs Urban) vs Final Grade")
+    plt.xlabel("Address Type")
+    plt.ylabel("Final Grade (G3)")
+    plt.show()
 
 #Family size vs. Final Grade 
 if "famsize_LE3" in df.columns:
