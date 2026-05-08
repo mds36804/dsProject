@@ -142,7 +142,11 @@ plt.title("Past Failures vs Final Grade")
 plt.show()
 
 #Mother's education vs. Final Grade
-
+plt.figure(figsize = (8,5))
+sea.boxplot(x="Medu", y="G3", data = df, palette = "Blues")
+plt.title("Mother's Education Level vs. Final Grade")
+plt.xlabel("Mother's Education (0 = none, 4=higher ed)")
+plt.show()
 
 #Father's education vs. Final Grade 
 plt.figure(figsize=(8,5))
