@@ -62,7 +62,7 @@ numeric_cols = [
 
 df[numeric_cols] = df[numeric_cols].apply(pd.to_numeric, errors="coerce")
 
-#remove grade values that aren't 0-20
+#remove grade values that aren't 0-20 (outliers)
 df = df[(df["G1"] <= 20) & (df["G2"] <= 20) & (df["G3"] <= 20)]
 
 #drop missing values
@@ -87,6 +87,10 @@ print(df.info())
 #-----------
 
 #eDA
+print("\n SUMMARY STATISTICS")
+summary_cols = ["age", "studytime", "failures", "absences", "Medu", "Fedu", "G1", "G2", "G3"]
+summary = df[summary_cols].agg(["mean", "median", "var", "std", "min", "max"])
+print(summary.round(2))
 
 #-----
 
@@ -97,6 +101,24 @@ plt.hist(df["G3"], bins=21, edgecolor="white", color="steelblue")
 plt.title("Final Grade (G3) Distribution")
 plt.xlabel("Grade")
 plt.ylabel("Count")
+plt.show()
+
+#KDE plot for G3
+plt.figure(figsize = (8,4))
+sea.kdeplot(df["G3"], fill=True, color = "steelblue")
+plt.title("KDE: Final Grade (G3) Distribution")
+plt.xlabel("Grade")
+plt.ylabel("Density")
+plt.show()
+
+#KDE plots for G1, G2, G3 for comparison
+plt.figure(figsize = (8,4))
+for grade, color in zip(["G1", "G2", "G3"],["#4c9be8", "#f4a261", "#2a9d8f"]):
+    sea.kdeplot(df[grade], fill=True, alpha=0.4, label=grade, color=color)
+plt.title("KDE: Grade Distribution Across G1, G2, G3")
+plt.xlabel("Grade")
+plt.ylabel("Density")
+plt.legend()
 plt.show()
 
 #all features bar chart
@@ -119,6 +141,50 @@ sea.boxplot(x="failures", y="G3", data=df)
 plt.title("Past Failures vs Final Grade")
 plt.show()
 
+#Mother's education vs. Final Grade
+plt.figure(figsize = (8,5))
+sea.boxplot(x="Medu", y="G3", data = df, palette = "Blues")
+plt.title("Mother's Education Level vs. Final Grade")
+plt.xlabel("Mother's Education (0 = none, 4=higher ed)")
+plt.show()
+
+#Father's education vs. Final Grade 
+plt.figure(figsize=(8,5))
+sea.boxplot(x="Fedu", y="G3", data=df, palette = "Oranges")
+plt.title("Father's Education Level vs. Final Grade")
+plt.xlabel("Father's Education (0=none, 4= higher ed)")
+plt.ylabel("Final Grade (G3)")
+plt.show()
+
+#Gender vs. Final Grade boxplot
+if "sex_M" in df.columns:
+    plt.figure(figsize = (6,5))
+    sea.boxplot(x="sex_M", y="G3", data = df, palette = "Set2")
+    plt.xticks([0, 1], ["Female", "Male"])
+    plt.title("Sex vs Final Grade")
+    plt.xlabel("Sex")
+    plt.ylabel("Final Grade (G3)")
+    plt.show()
+
+#Urban vs. Rural Address vs. Final Grade 
+if "address_U" in df.columns:
+    plt.figure(figsize=(6, 5))
+    sea.boxplot(x="address_U", y="G3", data=df, palette="Set1")
+    plt.xticks([0, 1], ["Rural", "Urban"])
+    plt.title("Address (Rural vs Urban) vs Final Grade")
+    plt.xlabel("Address Type")
+    plt.ylabel("Final Grade (G3)")
+    plt.show()
+
+#Family size vs. Final Grade 
+if "famsize_LE3" in df.columns:
+    plt.figure(figsize = (6,5))
+    sea.boxplot(x="famsize_LE3", y="G3", data=df, palette="Pastel1")
+    plt.xticks([0, 1], ["Greater than 3", "3 or less"])
+    plt.title("Family Size vs Final Grade")
+    plt.xlabel("Family Size")
+    plt.ylabel("Final Grade (G3)")
+    plt.show()
 
 #absences vs g3
 plt.figure(figsize=(8,5))
@@ -129,12 +195,20 @@ plt.title("Absences vs Final Grade")
 plt.show()
 
 # studytime vs g3
-
 plt.figure(figsize=(8,5))
 plt.scatter(df["studytime"], df["G3"], alpha=0.5)
 plt.xlabel("Study Time")
 plt.ylabel("Final Grade (G3)")
 plt.title("Study Time vs Final Grade")
+plt.show()
+
+#Parental education (Medu + Fedu average) vs. G3 scatterplot
+plt.figure(figsize=(8, 5))
+df["avg_parental_edu"] = (df["Medu"] + df["Fedu"]) / 2
+plt.scatter(df["avg_parental_edu"], df["G3"], alpha=0.4, color="purple")
+plt.xlabel("Average Parental Education Level")
+plt.ylabel("Final Grade (G3)")
+plt.title("Average Parental Education vs Final Grade")
 plt.show()
 
 #heatmap
@@ -238,6 +312,23 @@ mse_rf = mean_squared_error(yreg_test, pred_rf)
 rmse_rf = np.sqrt(mse_rf)
 r2_rf = r2_score(yreg_test, pred_rf)
 
+#print decision tree
+from sklearn.tree import plot_tree
+
+plt.figure(figsize=(25,12))
+plot_tree(
+    dt,
+    feature_names=X.columns,
+    filled=True,
+    max_depth=3,
+    impurity=False,
+    proportion=False,
+    precision = 0,
+    fontsize = 10,
+    rounded=True
+)
+plt.show()
+
 print("\nRandom Forest Regressor:")
 print("  MSE:", mse_rf)
 print("  RMSE:", rmse_rf)
@@ -280,6 +371,7 @@ print("Accuracy:", accuracy_score(y_test_cls, preds))
 print("\nClassification Report:")
 print(classification_report(y_test_cls, preds))
 
+
 # 5-fold cross-validation on the Random Forest Regressor
 cv_scores = cross_val_score(rf, X, y_reg, cv=5, scoring='r2')
 
@@ -297,4 +389,15 @@ results = pd.DataFrame({
 
 print("\nModel Comparison Table:")
 print(results)
+
+#Model comparison bar chart (visual summary of R squared across models)
+plt.figure(figsize = (8,5))
+plt.bar(results["Model"], results["R²"], color=["#4c9be8", "#f4a261", "#2a9d8f"], edgecolor="white")
+plt.title("Model Comparison: R² Score")
+plt.ylabel("R² Score")
+plt.ylim(0, 1)
+for i, v in enumerate(results["R²"]):
+    plt.text(i, v + 0.01, f"{v:.3f}", ha="center", fontsize=11)
+plt.tight_layout()
+plt.show()
 
