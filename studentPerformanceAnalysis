@@ -218,6 +218,9 @@ plt.figure(figsize=(12,10))
 sea.heatmap(df_numeric.corr(), cmap="coolwarm", annot=False)
 plt.title("Correlation Heatmap")
 plt.show()
+plt.clf()
+plt.close()
+
 
 #_____________________________________
 
