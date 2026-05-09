@@ -374,6 +374,31 @@ print("Accuracy:", accuracy_score(y_test_cls, preds))
 print("\nClassification Report:")
 print(classification_report(y_test_cls, preds))
 
+#------------- adding precision, recall, f1 score and confusion matrix for classification evaluation (adding to this kat's section)
+from sklearn.metrics import precision_score, recall_score, f1_score, confusion_matrix
+
+precision = precision_score(y_test_cls, preds)
+recall = recall_score(y_test_cls, preds)
+f1 = f1_score(y_test_cls, preds)
+
+print("\nClassification Metrics:")
+print("Precision:", precision)
+print("Recall:", recall)
+print("F1 Score:", f1)
+
+cm = confusion_matrix(y_test_cls, preds)
+print("\nConfusion Matrix:")
+print(cm)
+
+plt.figure(figsize=(6,4))
+sea.heatmap(cm, annot=True, fmt="d", cmap="Blues",
+            xticklabels=["Fail", "Pass"],
+            yticklabels=["Fail", "Pass"])
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.title("Confusion Matrix Heatmap")
+plt.show()
+#---------------
 
 # 5-fold cross-validation on the Random Forest Regressor
 cv_scores = cross_val_score(rf, X, y_reg, cv=5, scoring='r2')
@@ -404,3 +429,40 @@ for i, v in enumerate(results["R²"]):
 plt.tight_layout()
 plt.show()
 
+#---------------------------------------------
+# ADDED: PREDICT FINAL GRADE FOR A NEW STUDENT
+
+def predict_student_grade(model, data_dict, feature_columns):
+    df_new = pd.DataFrame([data_dict])
+
+    for col in feature_columns:
+        if col not in df_new.columns:
+            df_new[col] = 0
+
+    df_new = df_new[feature_columns]
+
+    prediction = model.predict(df_new)[0]
+    return prediction
+
+df["predicted_G3"] = df.apply(
+    lambda row: predict_student_grade(rf, row.to_dict(), X_train.columns),
+    axis=1
+)
+
+plt.figure(figsize=(8,5))
+plt.scatter(df["G3"], df["predicted_G3"], alpha=0.5)
+plt.xlabel("Actual G3")
+plt.ylabel("Predicted G3")
+plt.title("Actual vs Predicted Final Grade (G3)")
+plt.show()
+
+# Residual plot
+residuals = df["predicted_G3"] - df["G3"]
+
+plt.figure(figsize=(8,5))
+plt.scatter(df["predicted_G3"], residuals, alpha=0.5)
+plt.axhline(0, color="red", linestyle="--", linewidth=2)
+plt.xlabel("Predicted G3")
+plt.ylabel("Residual (Predicted - Actual)")
+plt.title("Residual Plot")
+plt.show()
