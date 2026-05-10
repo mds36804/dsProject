@@ -85,142 +85,142 @@ print(df.head())
 print(df.info())
 
 
-# #-----------
+#-----------
 
-# #eDA
-# print("\n SUMMARY STATISTICS")
-# summary_cols = ["age", "studytime", "failures", "absences", "Medu", "Fedu", "G1", "G2", "G3"]
-# summary = df[summary_cols].agg(["mean", "median", "var", "std", "min", "max"])
-# print(summary.round(2))
+#eDA
+print("\n SUMMARY STATISTICS")
+summary_cols = ["age", "studytime", "failures", "absences", "Medu", "Fedu", "G1", "G2", "G3"]
+summary = df[summary_cols].agg(["mean", "median", "var", "std", "min", "max"])
+print(summary.round(2))
 
-# #-----
+#-----
 
 
-# # G3 distribution as a Bar chart
-# plt.figure(figsize=(10,4))
-# plt.hist(df["G3"], bins=21, edgecolor="white", color="steelblue")
-# plt.title("Final Grade (G3) Distribution")
-# plt.xlabel("Grade")
-# plt.ylabel("Count")
-# plt.show()
+# G3 distribution as a Bar chart
+plt.figure(figsize=(10,4))
+plt.hist(df["G3"], bins=21, edgecolor="white", color="steelblue")
+plt.title("Final Grade (G3) Distribution")
+plt.xlabel("Grade")
+plt.ylabel("Count")
+plt.show()
 
-# #KDE plot for G3
-# plt.figure(figsize = (8,4))
-# sea.kdeplot(df["G3"], fill=True, color = "steelblue")
-# plt.title("KDE: Final Grade (G3) Distribution")
-# plt.xlabel("Grade")
-# plt.ylabel("Density")
-# plt.show()
+#KDE plot for G3
+plt.figure(figsize = (8,4))
+sea.kdeplot(df["G3"], fill=True, color = "steelblue")
+plt.title("KDE: Final Grade (G3) Distribution")
+plt.xlabel("Grade")
+plt.ylabel("Density")
+plt.show()
 
-# #KDE plots for G1, G2, G3 for comparison
-# plt.figure(figsize = (8,4))
-# for grade, color in zip(["G1", "G2", "G3"],["#4c9be8", "#f4a261", "#2a9d8f"]):
-#     sea.kdeplot(df[grade], fill=True, alpha=0.4, label=grade, color=color)
-# plt.title("KDE: Grade Distribution Across G1, G2, G3")
-# plt.xlabel("Grade")
-# plt.ylabel("Density")
-# plt.legend()
-# plt.show()
+#KDE plots for G1, G2, G3 for comparison
+plt.figure(figsize = (8,4))
+for grade, color in zip(["G1", "G2", "G3"],["#4c9be8", "#f4a261", "#2a9d8f"]):
+    sea.kdeplot(df[grade], fill=True, alpha=0.4, label=grade, color=color)
+plt.title("KDE: Grade Distribution Across G1, G2, G3")
+plt.xlabel("Grade")
+plt.ylabel("Density")
+plt.legend()
+plt.show()
 
-# #all features bar chart
-# numeric_cols = ["age","studytime","failures","absences","G1","G2","G3"]
+#all features bar chart
+numeric_cols = ["age","studytime","failures","absences","G1","G2","G3"]
 
-# df[numeric_cols].hist(figsize=(12,8), bins=15, edgecolor="white")
-# plt.suptitle("Numeric Feature Distributions")
-# plt.show()
+df[numeric_cols].hist(figsize=(12,8), bins=15, edgecolor="white")
+plt.suptitle("Numeric Feature Distributions")
+plt.show()
 
-# #study time vs final grade
-# plt.figure(figsize=(8,5))
-# sea.boxplot(x="studytime", y="G3", data=df)
-# plt.title("Study Time vs Final Grade")
-# plt.show()
+#study time vs final grade
+plt.figure(figsize=(8,5))
+sea.boxplot(x="studytime", y="G3", data=df)
+plt.title("Study Time vs Final Grade")
+plt.show()
 
-# #failures vs final grade
+#failures vs final grade
 
-# plt.figure(figsize=(8,5))
-# sea.boxplot(x="failures", y="G3", data=df)
-# plt.title("Past Failures vs Final Grade")
-# plt.show()
+plt.figure(figsize=(8,5))
+sea.boxplot(x="failures", y="G3", data=df)
+plt.title("Past Failures vs Final Grade")
+plt.show()
 
-# #Mother's education vs. Final Grade
-# plt.figure(figsize = (8,5))
-# sea.boxplot(x="Medu", y="G3", data = df, palette = "Blues")
-# plt.title("Mother's Education Level vs. Final Grade")
-# plt.xlabel("Mother's Education (0 = none, 4=higher ed)")
-# plt.show()
+#Mother's education vs. Final Grade
+plt.figure(figsize = (8,5))
+sea.boxplot(x="Medu", y="G3", data = df, palette = "Blues")
+plt.title("Mother's Education Level vs. Final Grade")
+plt.xlabel("Mother's Education (0 = none, 4=higher ed)")
+plt.show()
 
-# #Father's education vs. Final Grade 
-# plt.figure(figsize=(8,5))
-# sea.boxplot(x="Fedu", y="G3", data=df, palette = "Oranges")
-# plt.title("Father's Education Level vs. Final Grade")
-# plt.xlabel("Father's Education (0=none, 4= higher ed)")
-# plt.ylabel("Final Grade (G3)")
-# plt.show()
+#Father's education vs. Final Grade 
+plt.figure(figsize=(8,5))
+sea.boxplot(x="Fedu", y="G3", data=df, palette = "Oranges")
+plt.title("Father's Education Level vs. Final Grade")
+plt.xlabel("Father's Education (0=none, 4= higher ed)")
+plt.ylabel("Final Grade (G3)")
+plt.show()
 
-# #Gender vs. Final Grade boxplot
-# if "sex_M" in df.columns:
-#     plt.figure(figsize = (6,5))
-#     sea.boxplot(x="sex_M", y="G3", data = df, palette = "Set2")
-#     plt.xticks([0, 1], ["Female", "Male"])
-#     plt.title("Sex vs Final Grade")
-#     plt.xlabel("Sex")
-#     plt.ylabel("Final Grade (G3)")
-#     plt.show()
+#Gender vs. Final Grade boxplot
+if "sex_M" in df.columns:
+    plt.figure(figsize = (6,5))
+    sea.boxplot(x="sex_M", y="G3", data = df, palette = "Set2")
+    plt.xticks([0, 1], ["Female", "Male"])
+    plt.title("Sex vs Final Grade")
+    plt.xlabel("Sex")
+    plt.ylabel("Final Grade (G3)")
+    plt.show()
 
-# #Urban vs. Rural Address vs. Final Grade 
-# if "address_U" in df.columns:
-#     plt.figure(figsize=(6, 5))
-#     sea.boxplot(x="address_U", y="G3", data=df, palette="Set1")
-#     plt.xticks([0, 1], ["Rural", "Urban"])
-#     plt.title("Address (Rural vs Urban) vs Final Grade")
-#     plt.xlabel("Address Type")
-#     plt.ylabel("Final Grade (G3)")
-#     plt.show()
+#Urban vs. Rural Address vs. Final Grade 
+if "address_U" in df.columns:
+    plt.figure(figsize=(6, 5))
+    sea.boxplot(x="address_U", y="G3", data=df, palette="Set1")
+    plt.xticks([0, 1], ["Rural", "Urban"])
+    plt.title("Address (Rural vs Urban) vs Final Grade")
+    plt.xlabel("Address Type")
+    plt.ylabel("Final Grade (G3)")
+    plt.show()
 
-# #Family size vs. Final Grade 
-# if "famsize_LE3" in df.columns:
-#     plt.figure(figsize = (6,5))
-#     sea.boxplot(x="famsize_LE3", y="G3", data=df, palette="Pastel1")
-#     plt.xticks([0, 1], ["Greater than 3", "3 or less"])
-#     plt.title("Family Size vs Final Grade")
-#     plt.xlabel("Family Size")
-#     plt.ylabel("Final Grade (G3)")
-#     plt.show()
+#Family size vs. Final Grade 
+if "famsize_LE3" in df.columns:
+    plt.figure(figsize = (6,5))
+    sea.boxplot(x="famsize_LE3", y="G3", data=df, palette="Pastel1")
+    plt.xticks([0, 1], ["Greater than 3", "3 or less"])
+    plt.title("Family Size vs Final Grade")
+    plt.xlabel("Family Size")
+    plt.ylabel("Final Grade (G3)")
+    plt.show()
 
-# #absences vs g3
-# plt.figure(figsize=(8,5))
-# plt.scatter(df["absences"], df["G3"], alpha=0.5)
-# plt.xlabel("Absences")
-# plt.ylabel("Final Grade (G3)")
-# plt.title("Absences vs Final Grade")
-# plt.show()
+#absences vs g3
+plt.figure(figsize=(8,5))
+plt.scatter(df["absences"], df["G3"], alpha=0.5)
+plt.xlabel("Absences")
+plt.ylabel("Final Grade (G3)")
+plt.title("Absences vs Final Grade")
+plt.show()
 
-# # studytime vs g3
-# plt.figure(figsize=(8,5))
-# plt.scatter(df["studytime"], df["G3"], alpha=0.5)
-# plt.xlabel("Study Time")
-# plt.ylabel("Final Grade (G3)")
-# plt.title("Study Time vs Final Grade")
-# plt.show()
+# studytime vs g3
+plt.figure(figsize=(8,5))
+plt.scatter(df["studytime"], df["G3"], alpha=0.5)
+plt.xlabel("Study Time")
+plt.ylabel("Final Grade (G3)")
+plt.title("Study Time vs Final Grade")
+plt.show()
 
-# #Parental education (Medu + Fedu average) vs. G3 scatterplot
-# plt.figure(figsize=(8, 5))
-# df["avg_parental_edu"] = (df["Medu"] + df["Fedu"]) / 2
-# plt.scatter(df["avg_parental_edu"], df["G3"], alpha=0.4, color="purple")
-# plt.xlabel("Average Parental Education Level")
-# plt.ylabel("Final Grade (G3)")
-# plt.title("Average Parental Education vs Final Grade")
-# plt.show()
+#Parental education (Medu + Fedu average) vs. G3 scatterplot
+plt.figure(figsize=(8, 5))
+df["avg_parental_edu"] = (df["Medu"] + df["Fedu"]) / 2
+plt.scatter(df["avg_parental_edu"], df["G3"], alpha=0.4, color="purple")
+plt.xlabel("Average Parental Education Level")
+plt.ylabel("Final Grade (G3)")
+plt.title("Average Parental Education vs Final Grade")
+plt.show()
 
-# #heatmap
-# plt.figure(figsize=(12,10))
-# df_numeric = df.select_dtypes(include=["int64", "float64", "bool"])
-# plt.figure(figsize=(12,10))
-# sea.heatmap(df_numeric.corr(), cmap="coolwarm", annot=False)
-# plt.title("Correlation Heatmap")
-# plt.show()
-# plt.clf()
-# plt.close()
+#heatmap
+plt.figure(figsize=(12,10))
+df_numeric = df.select_dtypes(include=["int64", "float64", "bool"])
+plt.figure(figsize=(12,10))
+sea.heatmap(df_numeric.corr(), cmap="coolwarm", annot=False)
+plt.title("Correlation Heatmap")
+plt.show()
+plt.clf()
+plt.close()
 
 #UNCOMMENT FROM HERE TO UP
 #_____________________________________
@@ -500,7 +500,7 @@ categorical = [
 numeric = [
     "Medu", "Fedu",
     "studytime", "failures",
-    "absences", "health", "goout"
+    "absences", "health", "goout", "G1", "G2"
 ]
 
 # 4. Combine everything
@@ -627,3 +627,4 @@ plt.title("Random Forest Feature Importance")
 plt.xlabel("Importance")
 plt.tight_layout()
 plt.show()
+
