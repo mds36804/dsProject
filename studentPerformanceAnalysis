@@ -10,6 +10,17 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import cross_val_score
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.compose import ColumnTransformer
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.compose import ColumnTransformer
+
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor, plot_tree
+from sklearn.ensemble import RandomForestRegressor
+
+from sklearn.metrics import r2_score, mean_squared_error
 
 #step 1: imports
 #step 1.5: clean the data set
@@ -37,52 +48,52 @@ df = pd.read_csv("Maths.csv")
 
 #CLEAN THE DATA RN 
 
-#---------------------------------------------------------------------
-#convert coloums to 0/1
-yes_no_cols = [
-    "schoolsup","famsup","paid","activities","nursery",
-    "higher","internet","romantic"
-]
-df[yes_no_cols] = df[yes_no_cols].replace({"yes": 1, "no": 0})
+# #---------------------------------------------------------------------
+# #convert coloums to 0/1
+# yes_no_cols = [
+#     "schoolsup","famsup","paid","activities","nursery",
+#     "higher","internet","romantic"
+# ]
+# df[yes_no_cols] = df[yes_no_cols].replace({"yes": 1, "no": 0})
 
-#categorical coloums to dtypes
-cat_cols = [
-    "school","sex","address","famsize","Pstatus",
-    "Mjob","Fjob","reason","guardian"
-]
+# #categorical coloums to dtypes
+# cat_cols = [
+#     "school","sex","address","famsize","Pstatus",
+#     "Mjob","Fjob","reason","guardian"
+# ]
 
-for col in cat_cols:
-    df[col] = df[col].astype("category")
+# for col in cat_cols:
+#     df[col] = df[col].astype("category")
 
-#numerical coloums to dtypes
-numeric_cols = [
-    "age","Medu","Fedu","traveltime","studytime","failures",
-    "famrel","freetime","goout","Dalc","Walc","health",
-    "absences","G1","G2","G3"
-]
+# #numerical coloums to dtypes
+# numeric_cols = [
+#     "age","Medu","Fedu","traveltime","studytime","failures",
+#     "famrel","freetime","goout","Dalc","Walc","health",
+#     "absences","G1","G2","G3"
+# ]
 
-df[numeric_cols] = df[numeric_cols].apply(pd.to_numeric, errors="coerce")
+# df[numeric_cols] = df[numeric_cols].apply(pd.to_numeric, errors="coerce")
 
-#remove grade values that aren't 0-20 (outliers)
-df = df[(df["G1"] <= 20) & (df["G2"] <= 20) & (df["G3"] <= 20)]
+# #remove grade values that aren't 0-20 (outliers)
+# df = df[(df["G1"] <= 20) & (df["G2"] <= 20) & (df["G3"] <= 20)]
 
-#drop missing values
-df = df.dropna()
+# #drop missing values
+# df = df.dropna()
 
-# one-hot encode 
-df = pd.get_dummies(df, columns=["school","Mjob","Fjob","reason","guardian"], drop_first=True)
+# # one-hot encode 
+# df = pd.get_dummies(df, columns=["school","Mjob","Fjob","reason","guardian"], drop_first=True)
 
-# pass/fail label
-df["pass"] = (df["G3"] >= 10).astype(int)
+# # pass/fail label
+# df["pass"] = (df["G3"] >= 10).astype(int)
 
-binary_cols = ["schoolsup","famsup","paid","activities","nursery",
-               "higher","internet","romantic"]
+# binary_cols = ["schoolsup","famsup","paid","activities","nursery",
+#                "higher","internet","romantic"]
 
-df[binary_cols] = df[binary_cols].replace({"yes": 1, "no": 0}).astype(int)
+# df[binary_cols] = df[binary_cols].replace({"yes": 1, "no": 0}).astype(int)
 
 
-print(df.head())
-print(df.info())
+# print(df.head())
+# print(df.info())
 
 
 #-----------
@@ -470,161 +481,373 @@ plt.close()
 
 # STARTING OVER CODE
 
-# ============================
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import r2_score, mean_squared_error
-# ============================
-# 2. Reduced predictor set
+# # ============================
+# from sklearn.model_selection import train_test_split
+# from sklearn.preprocessing import OneHotEncoder, StandardScaler
+# from sklearn.compose import ColumnTransformer
+# from sklearn.pipeline import Pipeline
+# from sklearn.linear_model import LinearRegression
+# from sklearn.metrics import r2_score, mean_squared_error
+# # ============================
+# # 2. Reduced predictor set
 
-df["famsize"] = df["famsize"].astype("category").cat.codes
-df["Pstatus"] = df["Pstatus"].astype("category").cat.codes
+# df["famsize"] = df["famsize"].astype("category").cat.codes
+# df["Pstatus"] = df["Pstatus"].astype("category").cat.codes
 
-mjob_cols = [col for col in df.columns if col.startswith("Mjob_")]
-fjob_cols = [col for col in df.columns if col.startswith("Fjob_")]
+# mjob_cols = [col for col in df.columns if col.startswith("Mjob_")]
+# fjob_cols = [col for col in df.columns if col.startswith("Fjob_")]
 
-# 2. Categorical predictors that still exist
-categorical = [
-    "famsize", 
-    "Pstatus",
-    "schoolsup", 
-    "famsup",
-    "internet", 
-    "higher"
+# # 2. Categorical predictors that still exist
+# categorical = [
+#     "famsize", 
+#     "Pstatus",
+#     "schoolsup", 
+#     "famsup",
+#     "internet", 
+#     "higher"
+# ]
+
+# # 3. Numeric predictors
+# numeric = [
+#     "Medu", "Fedu",
+#     "studytime", "failures",
+#     "absences", "health", "goout", "G1", "G2"
+# ]
+
+# # 4. Combine everything
+
+# predictors = categorical + numeric + mjob_cols + fjob_cols
+
+# X = df[predictors]
+# y = df["G3"]
+
+# # 5. Preprocessing
+# from sklearn.preprocessing import StandardScaler
+# from sklearn.model_selection import train_test_split
+# from sklearn.linear_model import LinearRegression
+# from sklearn.metrics import r2_score, mean_squared_error
+
+# scaler = StandardScaler()
+# X_scaled = scaler.fit_transform(X)
+
+# # 6. Train/test split
+# X_train, X_test, y_train, y_test = train_test_split(
+#     X_scaled, y, test_size=0.2, random_state=42
+# )
+
+# # 7. Fit model
+# model = LinearRegression()
+# model.fit(X_train, y_train)
+
+# # 8. Evaluate
+# y_pred = model.predict(X_test)
+
+# print("R²:", r2_score(y_test, y_pred))
+# print("RMSE:", np.sqrt(mean_squared_error(y_test, y_pred)))
+
+# # 9. Coefficients
+# coef_table = pd.DataFrame({
+#     "feature": predictors,
+#     "coefficient": model.coef_
+# }).sort_values(by="coefficient", ascending=False)
+
+# print(coef_table)
+
+# print("\n")
+
+# predictors = predictors  # from your reduced model code
+
+# results = []
+
+# for col in predictors:
+#     X_single = df[[col]]
+#     y = df["G3"]
+    
+#     model = LinearRegression()
+#     model.fit(X_single, y)
+    
+#     y_pred = model.predict(X_single)
+#     r2 = r2_score(y, y_pred)
+    
+#     results.append((col, r2))
+
+# # Convert to DataFrame and sort
+# r2_table = pd.DataFrame(results, columns=["predictor", "r2"]).sort_values(
+#     by="r2", ascending=False
+# )
+
+# print(r2_table)
+
+
+# plt.figure(figsize=(10, 8))
+# sea.barplot(
+#     data=r2_table,
+#     x="r2",
+#     y="predictor",
+#     palette="viridis"
+# )
+
+# plt.title("R² Values for Single-Predictor Models")
+# plt.xlabel("R²")
+# plt.ylabel("Predictor")
+# plt.tight_layout()
+# plt.show()
+
+# # Train Decision Tree
+# dt_reg = DecisionTreeRegressor(max_depth=4, random_state=42)
+# dt_reg.fit(X_train, y_train)
+
+# # Predict
+# dt_pred = dt_reg.predict(X_test)
+
+# print("Decision Tree Regression:")
+# print("  R²:", r2_score(y_test, dt_pred))
+# print("  MSE:", mean_squared_error(y_test, dt_pred))
+
+# # Plot the tree
+# plt.figure(figsize=(20, 12))
+# plot_tree(
+#     dt_reg,
+#     feature_names=predictors,
+#     filled=True,
+#     rounded=True,
+#     fontsize=8
+# )
+# plt.title("Decision Tree Regression Model")
+# plt.show()
+
+
+# rf_reg = RandomForestRegressor(
+#     n_estimators=200,
+#     random_state=42
+# )
+# rf_reg.fit(X_train, y_train)
+
+# rf_pred = rf_reg.predict(X_test)
+
+# print("Random Forest Regression:")
+# print("  R²:", r2_score(y_test, rf_pred))
+# print("  MSE:", mean_squared_error(y_test, rf_pred))
+
+# importances = rf_reg.feature_importances_
+# indices = np.argsort(importances)
+
+# plt.figure(figsize=(10, 8))
+# plt.barh(np.array(predictors)[indices], importances[indices])
+# plt.title("Random Forest Feature Importance")
+# plt.xlabel("Importance")
+# plt.tight_layout()
+# plt.show()
+
+#ONE MODEL THAT TAKES IN ALL PREDICTORS EXCEPT G1 AND G2
+
+#ONE MODEL THAT TAKES IN ALL PREDICTORS INCLUDING G1 AND G2
+
+#MULTIPLE MODELS FOR EACH PREDICTORS TO DETERMINE R^2 VALUES FOR EACH PREDICTOR INDIVIDUALLY
+
+
+binary_cols = ["schoolsup", "famsup", "internet", "higher"]
+
+for col in binary_cols:
+    df[col] = df[col].map({"no": 0, "yes": 1})
+
+
+mjob_cols = [c for c in df.columns if c.startswith("Mjob_")]
+fjob_cols = [c for c in df.columns if c.startswith("Fjob_")]
+
+categorical = ["famsize", "Pstatus"]
+
+numeric_no_grades = [
+    "Medu", "Fedu", "studytime", "failures",
+    "absences", "health", "goout",
+    "schoolsup", "famsup", "internet", "higher"
 ]
 
-# 3. Numeric predictors
-numeric = [
-    "Medu", "Fedu",
-    "studytime", "failures",
-    "absences", "health", "goout", "G1", "G2"
-]
+numeric_with_grades = numeric_no_grades + ["G1", "G2"]
 
-# 4. Combine everything
-
-predictors = categorical + numeric + mjob_cols + fjob_cols
-
-X = df[predictors]
 y = df["G3"]
 
-# 5. Preprocessing
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import r2_score, mean_squared_error
+# ============================================================
+# FUNCTION: TRAIN + EVALUATE MODEL
+# ============================================================
 
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
+def run_model(X, numeric_features, categorical_features, model, name):
 
-# 6. Train/test split
-X_train, X_test, y_train, y_test = train_test_split(
-    X_scaled, y, test_size=0.2, random_state=42
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
+
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ("num", StandardScaler(), numeric_features),
+            ("cat", OneHotEncoder(drop="first"), categorical_features)
+        ],
+        remainder="passthrough"
+    )
+
+    X_train_p = preprocessor.fit_transform(X_train)
+    X_test_p = preprocessor.transform(X_test)
+
+    model.fit(X_train_p, y_train)
+    pred = model.predict(X_test_p)
+
+    print("\n==============================")
+    print(name)
+    print("==============================")
+    print("R²:", r2_score(y_test, pred))
+    print("RMSE:", np.sqrt(mean_squared_error(y_test, pred)))
+
+    return model, preprocessor
+
+
+# ============================================================
+# MODEL 1: LINEAR REGRESSION (NO G1/G2)
+# ============================================================
+
+X1 = df[categorical + numeric_no_grades + mjob_cols + fjob_cols]
+
+lr1, prep1 = run_model(
+    X1,
+    numeric_no_grades,
+    categorical,
+    LinearRegression(),
+    "Linear Regression (NO G1/G2)"
 )
 
-# 7. Fit model
-model = LinearRegression()
-model.fit(X_train, y_train)
+# ============================================================
+# MODEL 2: LINEAR REGRESSION (WITH G1/G2)
+# ============================================================
 
-# 8. Evaluate
-y_pred = model.predict(X_test)
+X2 = df[categorical + numeric_with_grades + mjob_cols + fjob_cols]
 
-print("R²:", r2_score(y_test, y_pred))
-print("RMSE:", np.sqrt(mean_squared_error(y_test, y_pred)))
-
-# 9. Coefficients
-coef_table = pd.DataFrame({
-    "feature": predictors,
-    "coefficient": model.coef_
-}).sort_values(by="coefficient", ascending=False)
-
-print(coef_table)
-
-print("\n")
-
-predictors = predictors  # from your reduced model code
-
-results = []
-
-for col in predictors:
-    X_single = df[[col]]
-    y = df["G3"]
-    
-    model = LinearRegression()
-    model.fit(X_single, y)
-    
-    y_pred = model.predict(X_single)
-    r2 = r2_score(y, y_pred)
-    
-    results.append((col, r2))
-
-# Convert to DataFrame and sort
-r2_table = pd.DataFrame(results, columns=["predictor", "r2"]).sort_values(
-    by="r2", ascending=False
+lr2, prep2 = run_model(
+    X2,
+    numeric_with_grades,
+    categorical,
+    LinearRegression(),
+    "Linear Regression (WITH G1/G2)"
 )
 
-print(r2_table)
+# ============================================================
+# MODEL 3: DECISION TREE (NO G1/G2)
+# ============================================================
 
-
-plt.figure(figsize=(10, 8))
-sea.barplot(
-    data=r2_table,
-    x="r2",
-    y="predictor",
-    palette="viridis"
+dt1, prep_dt1 = run_model(
+    X1,
+    numeric_no_grades,
+    categorical,
+    DecisionTreeRegressor(max_depth=4, random_state=42),
+    "Decision Tree (NO G1/G2)"
 )
 
-plt.title("R² Values for Single-Predictor Models")
-plt.xlabel("R²")
-plt.ylabel("Predictor")
-plt.tight_layout()
+# Plot tree
+plt.figure(figsize=(18, 10))
+plot_tree(dt1, filled=True, rounded=True)
+plt.title("Decision Tree (NO G1/G2)")
 plt.show()
 
-# Train Decision Tree
-dt_reg = DecisionTreeRegressor(max_depth=4, random_state=42)
-dt_reg.fit(X_train, y_train)
+# ============================================================
+# MODEL 4: DECISION TREE (WITH G1/G2)
+# ============================================================
 
-# Predict
-dt_pred = dt_reg.predict(X_test)
-
-print("Decision Tree Regression:")
-print("  R²:", r2_score(y_test, dt_pred))
-print("  MSE:", mean_squared_error(y_test, dt_pred))
-
-# Plot the tree
-plt.figure(figsize=(20, 12))
-plot_tree(
-    dt_reg,
-    feature_names=predictors,
-    filled=True,
-    rounded=True,
-    fontsize=8
+dt2, prep_dt2 = run_model(
+    X2,
+    numeric_with_grades,
+    categorical,
+    DecisionTreeRegressor(max_depth=4, random_state=42),
+    "Decision Tree (WITH G1/G2)"
 )
-plt.title("Decision Tree Regression Model")
+
+plt.figure(figsize=(18, 10))
+plot_tree(dt2, filled=True, rounded=True)
+plt.title("Decision Tree (WITH G1/G2)")
 plt.show()
 
+# ============================================================
+# MODEL 5: RANDOM FOREST (NO G1/G2)
+# ============================================================
 
-rf_reg = RandomForestRegressor(
-    n_estimators=200,
-    random_state=42
+rf1, prep_rf1 = run_model(
+    X1,
+    numeric_no_grades,
+    categorical,
+    RandomForestRegressor(n_estimators=200, random_state=42),
+    "Random Forest (NO G1/G2)"
 )
-rf_reg.fit(X_train, y_train)
 
-rf_pred = rf_reg.predict(X_test)
+# Feature importance
+importances = rf1.feature_importances_
 
-print("Random Forest Regression:")
-print("  R²:", r2_score(y_test, rf_pred))
-print("  MSE:", mean_squared_error(y_test, rf_pred))
-
-importances = rf_reg.feature_importances_
+all_features = numeric_no_grades + categorical + mjob_cols + fjob_cols
 indices = np.argsort(importances)
 
 plt.figure(figsize=(10, 8))
-plt.barh(np.array(predictors)[indices], importances[indices])
-plt.title("Random Forest Feature Importance")
-plt.xlabel("Importance")
-plt.tight_layout()
+plt.barh(np.array(all_features)[indices], importances[indices])
+plt.title("Random Forest Feature Importance (NO G1/G2)")
 plt.show()
 
+# ============================================================
+# MODEL 6: RANDOM FOREST (WITH G1/G2)
+# ============================================================
+
+rf2, prep_rf2 = run_model(
+    X2,
+    numeric_with_grades,
+    categorical,
+    RandomForestRegressor(n_estimators=200, random_state=42),
+    "Random Forest (WITH G1/G2)"
+)
+
+importances2 = rf2.feature_importances_
+
+all_features2 = numeric_with_grades + categorical + mjob_cols + fjob_cols
+indices2 = np.argsort(importances2)
+
+plt.figure(figsize=(10, 8))
+plt.barh(np.array(all_features2)[indices2], importances2[indices2])
+plt.title("Random Forest Feature Importance (WITH G1/G2)")
+plt.show()
+
+# ============================================================
+# INDIVIDUAL PREDICTOR R² MODELS
+# ============================================================
+
+all_predictors = (
+    categorical +
+    numeric_with_grades +
+    mjob_cols +
+    fjob_cols
+)
+
+results = []
+
+for col in all_predictors:
+
+    X_single = df[[col]]
+
+    if col in categorical:
+
+        temp = ColumnTransformer([
+            ("cat", OneHotEncoder(drop="first"), [col])
+        ], remainder="drop")
+
+        X_proc = temp.fit_transform(X_single)
+
+    else:
+        X_proc = X_single
+
+    model = LinearRegression()
+    model.fit(X_proc, y)
+
+    r2 = r2_score(y, model.predict(X_proc))
+    results.append((col, r2))
+
+r2_table = pd.DataFrame(results, columns=["Predictor", "R²"]).sort_values("R²", ascending=False)
+
+print("\nINDIVIDUAL PREDICTOR R² VALUES:\n")
+print(r2_table)
+
+plt.figure(figsize=(12, 8))
+sea.barplot(data=r2_table, x="R²", y="Predictor", palette="viridis")
+plt.title("Individual Predictor R²")
+plt.show()
